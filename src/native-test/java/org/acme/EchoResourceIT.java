@@ -3,6 +3,6 @@ package org.acme;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-class ExampleResourceIT extends ExampleResourceTest {
+class EchoResourceIT extends EchoResourceTest {
     // Execute the same tests but in packaged mode.
 }

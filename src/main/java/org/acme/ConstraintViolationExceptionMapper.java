@@ -11,7 +11,6 @@ import java.util.List;
 
 @Provider
 public class ConstraintViolationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
-
     @Override
     public Response toResponse(@Nonnull ConstraintViolationException e) {
         var violations = e.getConstraintViolations()

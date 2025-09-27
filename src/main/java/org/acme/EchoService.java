@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 
 @ApplicationScoped
 public class EchoService {
-
     public EchoResponse doWorkValidate(@Valid ValidEchoRequest req) {
         Log.info("valid...");
         return new EchoResponse(req);

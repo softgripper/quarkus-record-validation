@@ -12,8 +12,7 @@ public class NfcWhitelistSanitizerTest {
 
     @Test
     void nullInputReturnsNull() {
-        var result = sanitize("field", null);
-        assertNull(result);
+        assertNull(sanitize("field", null));
     }
 
     @Test
@@ -40,7 +39,7 @@ public class NfcWhitelistSanitizerTest {
     }
 
     @Test
-    void removesDisallowedCharactersButKeepsLettersDigitsPunctCurrency() {
+    void removesDisallowedCharactersButKeepsLettersDigitsPunctuationCurrency() {
         // Emoji (So) and ZWJ (Cf) should be removed; punctuation and currency kept
         var input = "A🙂B 1€-[]{}()";
         var result = sanitize("field", input);

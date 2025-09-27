@@ -1,5 +1,6 @@
-package org.acme;
+package org.acme.validation;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.MediaType;
@@ -29,9 +30,11 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
                 .build();
     }
 
+    @RegisterForReflection
     public record ViolationReport(String title, int status, List<Violation> violations) {
     }
 
+    @RegisterForReflection
     public record Violation(String field, String message) {
     }
 }

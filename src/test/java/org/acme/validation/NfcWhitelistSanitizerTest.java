@@ -1,9 +1,9 @@
-package org.acme;
+package org.acme.validation;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
-import static org.acme.NfcWhitelistSanitizer.sanitize;
+import static org.acme.validation.NfcWhitelistSanitizer.sanitize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

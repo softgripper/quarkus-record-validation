@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 
-import static org.acme.NfcWhitelistSanitizer.sanitize;
+import static org.acme.validation.NfcWhitelistSanitizer.sanitize;
 
 public record ValidEchoRequest(
         @NotBlank

@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.validation;
 
 import com.ibm.icu.text.Normalizer2;
 import com.ibm.icu.text.UnicodeSet;

@@ -1,5 +1,6 @@
 package org.acme;
 
+import io.quarkus.logging.Log;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -18,15 +19,16 @@ class EchoResourceTest {
     @ParameterizedTest
     @ValueSource(strings = {"/echo-raw", "/echo-valid", "/echo-from-service"})
     void echo_returns200(String path) {
-        var req = Map.of("message", "hello", "postcode", "1234");
-        postThen(req, path).statusCode(200).body("$", is(req));
+        var request = Map.of("message", "hello", "postcode", "1234");
+        var response = postThen(request, path).statusCode(200).body("$", is(request));
+        Log.info(response.extract().body().asString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"/echo-raw", "/echo-valid", "/echo-from-service"})
     void echo_invalidPayload_withViolationReport(String path) {
-        var req = Map.of("message", "", "postcode", "12");
-        postThen(req, path)
+        var request = Map.of("message", "", "postcode", "");
+        var response = postThen(request, path)
                 .statusCode(400)
                 .body("title", is("Constraint Violation"))
                 .body("status", is(400))
@@ -35,6 +37,7 @@ class EchoResourceTest {
                         is("must be 4 digits"),
                         anyOf(is("must not be blank"), is("must not be empty"))
                 ));
+        Log.info(response.extract().body().asString());
     }
 
     private static <T> ValidatableResponse postThen(T req, String path) {

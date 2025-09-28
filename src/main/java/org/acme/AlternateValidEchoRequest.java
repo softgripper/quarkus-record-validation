@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import org.acme.validation.ValidatorUtil;
 
-import static org.acme.validation.NfcWhitelistSanitizer.sanitize;
+import static org.acme.validation.TextNormalizer.normalize;
 
 public record AlternateValidEchoRequest(
         @NotBlank
@@ -19,8 +19,8 @@ public record AlternateValidEchoRequest(
 ) {
     public AlternateValidEchoRequest(String message, String postcode) {
         Log.info("ValidEchoRequest");
-        this.message = sanitize("message", message, true);
-        this.postcode = sanitize("postcode", postcode);
+        this.message = normalize(message, true);
+        this.postcode = normalize(postcode);
         ValidatorUtil.validate(this);
     }
 

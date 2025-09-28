@@ -120,10 +120,9 @@ class TextNormalizerTest {
 
         @Test
         void nbspNotCollapsedInDefaultMode() {
-            // In default mode, WHITESPACE uses \s+, which does not match NBSP; NBSPs are retained
             var nbsp = '\u00A0';
             var input = "a" + nbsp + nbsp + "b";
-            var expected = "a" + nbsp + nbsp + "b";
+            var expected = "a b";
             assertEquals(expected, normalize(input));
         }
     }

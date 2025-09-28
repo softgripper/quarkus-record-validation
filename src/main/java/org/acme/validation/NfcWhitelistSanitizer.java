@@ -16,16 +16,20 @@ public class NfcWhitelistSanitizer {
     }
 
     public static String sanitize(String field, String input) {
-        return sanitize(field, input, false);
+        return sanitize(field, input, false, Normalizer.Form.NFKC);
     }
 
     public static String sanitize(String field, String input, boolean preserveNewlines) {
+        return sanitize(field, input, preserveNewlines, Normalizer.Form.NFKC);
+    }
+
+    public static String sanitize(String field, String input, boolean preserveNewlines, Normalizer.Form form) {
         if (input == null) return null;
 
         var s = input;
 
-        if (!Normalizer.isNormalized(s, Normalizer.Form.NFKC)) {
-            s = Normalizer.normalize(s, Normalizer.Form.NFKC);
+        if (!Normalizer.isNormalized(s, form)) {
+            s = Normalizer.normalize(s, form);
         }
 
         s = s.strip();

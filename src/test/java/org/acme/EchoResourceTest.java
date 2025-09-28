@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.*;
 @TestHTTPEndpoint(EchoResource.class)
 class EchoResourceTest {
     @ParameterizedTest
-    @ValueSource(strings = {"/echo-raw", "/echo-valid", "/echo-from-service"})
+    @ValueSource(strings = {"/echo-raw", "/echo-valid", "/echo-from-service", "/echo-internal"})
     void echo_returns200(String path) {
         var request = Map.of("message", "hello", "postcode", "1234");
         var response = postThen(request, path).statusCode(200).body("$", is(request));
@@ -25,7 +25,7 @@ class EchoResourceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/echo-raw", "/echo-valid", "/echo-from-service"})
+    @ValueSource(strings = {"/echo-raw", "/echo-valid", "/echo-from-service", "/echo-internal"})
     void echo_invalidPayload_withViolationReport(String path) {
         var request = Map.of("message", "", "postcode", "");
         var response = postThen(request, path)

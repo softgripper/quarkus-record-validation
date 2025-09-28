@@ -33,6 +33,12 @@ public class EchoResource {
     }
 
     @POST
+    @Path("/echo-internal")
+    public EchoResponse echoInternal(EchoRequest req) {
+        return echoService.doWork(new AlternateValidEchoRequest(req));
+    }
+
+    @POST
     @Path("/echo-from-service")
     public EchoResponse echoFromService(EchoRequest req) {
         return echoService.doWorkValidate(new ValidEchoRequest(req));

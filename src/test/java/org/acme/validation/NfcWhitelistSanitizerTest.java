@@ -32,10 +32,10 @@ class NfcWhitelistSanitizerTest {
     }
 
     @Test
-    void collapsesMultipleNewlinesToSingleWhenPreserving() {
+    void collapsesMultipleNewlinesToDoubleWhenPreserving() {
         var input = "a\r\n\r\n\r\nb";
         var result = sanitize("field", input, true);
-        assertEquals("a\nb", result);
+        assertEquals("a\n\nb", result);
     }
 
     @Test
@@ -83,5 +83,19 @@ class NfcWhitelistSanitizerTest {
         var once = sanitize("field", input, true);
         var twice = sanitize("field", once, true);
         assertEquals(once, twice);
+    }
+
+    @Test
+    void greaterThanLessThanRemoved() {
+        var input = "<>";
+        var result = sanitize("field", input);
+        assertEquals("", result);
+    }
+
+    @Test
+    void basicExpectedCharacters() {
+        var input = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 \n-=!@#$%^&*()_+[]\\{}|;':\",./?";
+        var result = sanitize("field", input, true);
+        assertEquals(input, result);
     }
 }

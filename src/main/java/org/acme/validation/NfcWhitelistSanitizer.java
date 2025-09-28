@@ -10,7 +10,7 @@ import static java.lang.Character.*;
 public class NfcWhitelistSanitizer {
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
     private static final Pattern HSPACE = Pattern.compile("[\\p{Zs}\\t\\x0B\\f]+");
-    private static final Pattern MULTI_LF = Pattern.compile("\\n{2,}");
+    private static final Pattern EXCESS_LF = Pattern.compile("\\n{3,}");
 
     private NfcWhitelistSanitizer() {
     }
@@ -24,16 +24,16 @@ public class NfcWhitelistSanitizer {
 
         var s = input;
 
-        if (!Normalizer.isNormalized(s, Normalizer.Form.NFC)) {
-            s = Normalizer.normalize(s, Normalizer.Form.NFC);
+        if (!Normalizer.isNormalized(s, Normalizer.Form.NFKC)) {
+            s = Normalizer.normalize(s, Normalizer.Form.NFKC);
         }
 
-        s = s.trim();
+        s = s.strip();
 
         if (preserveNewlines) {
             // Canonicalize CRLF/CR to LF and collapse horizontal whitespace
             s = s.replace("\r\n", "\n").replace('\r', '\n');
-            s = MULTI_LF.matcher(s).replaceAll("\n");
+            s = EXCESS_LF.matcher(s).replaceAll("\n\n");
             s = HSPACE.matcher(s).replaceAll(" ");
         } else {
             // Collapse all whitespace (including newlines) to a single space
@@ -42,6 +42,10 @@ public class NfcWhitelistSanitizer {
 
         var sb = new StringBuilder(s.length());
         s.codePoints().forEach(cp -> {
+            if (isExplicitlyDisallowed(cp)) {
+                return;
+            }
+
             if (isAllowed(cp)) {
                 sb.appendCodePoint(cp);
             }
@@ -54,28 +58,21 @@ public class NfcWhitelistSanitizer {
         return result;
     }
 
-    @SuppressWarnings("unicode")
-    // Emulates the ICU UnicodeSet: [[:L:][:Nd:][:P:][:Sc:]\u0020 \n +]
+    private static boolean isExplicitlyDisallowed(int cp) {
+        return cp == '<' || cp == '>';
+    }
+
+    @SuppressWarnings("UnicodeEscape")
     private static boolean isAllowed(int cp) {
         // Explicit allowances not covered by categories
-        if (cp == ' ' || cp == '\n' || cp == '+') return true;
+        if (cp == ' ' || cp == '\n') return true;
 
-        // L* (letters), Nd (decimal digits), P* (punctuation), Sc (currency)
         return switch (getType(cp)) {
-            // [:L:]
             case UPPERCASE_LETTER, LOWERCASE_LETTER, TITLECASE_LETTER,
-                 MODIFIER_LETTER, OTHER_LETTER -> true;
+                 MODIFIER_LETTER, OTHER_LETTER, DECIMAL_DIGIT_NUMBER, CONNECTOR_PUNCTUATION, DASH_PUNCTUATION,
+                 START_PUNCTUATION, END_PUNCTUATION, INITIAL_QUOTE_PUNCTUATION, FINAL_QUOTE_PUNCTUATION,
+                 OTHER_PUNCTUATION, MATH_SYMBOL, SPACE_SEPARATOR, CURRENCY_SYMBOL, MODIFIER_SYMBOL -> true;
 
-            // [:Nd:]
-            case DECIMAL_DIGIT_NUMBER -> true;
-
-            // [:P:]
-            case CONNECTOR_PUNCTUATION, DASH_PUNCTUATION, START_PUNCTUATION,
-                 END_PUNCTUATION, INITIAL_QUOTE_PUNCTUATION, FINAL_QUOTE_PUNCTUATION,
-                 OTHER_PUNCTUATION -> true;
-
-            // [:Sc:]
-            case CURRENCY_SYMBOL -> true;
             default -> false;
         };
     }

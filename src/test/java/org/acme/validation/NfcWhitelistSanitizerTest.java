@@ -3,6 +3,8 @@ package org.acme.validation;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
+import java.text.Normalizer;
+
 import static org.acme.validation.NfcWhitelistSanitizer.sanitize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -55,14 +57,6 @@ class NfcWhitelistSanitizerTest {
     }
 
     @Test
-    void standaloneCombiningMarkIsRemoved() {
-        // Combining acute accent alone (Mn) is not allowed and gets dropped
-        var input = "\u0301";
-        var result = sanitize("field", input);
-        assertEquals("", result);
-    }
-
-    @Test
     void newlinesAreCollapsedToSpaceWhenNotPreserving() {
         var input = "a\n\nb";
         var result = sanitize("field", input);
@@ -75,6 +69,13 @@ class NfcWhitelistSanitizerTest {
         var input = "X𐍈🙂Y";
         var result = sanitize("field", input);
         assertEquals("X𐍈Y", result);
+    }
+
+    @Test
+    void allowEmoji() {
+        var input = "🙂";
+        var result = sanitize("field", input, false, Normalizer.Form.NFKC, true);
+        assertEquals("🙂", result);
     }
 
     @Test

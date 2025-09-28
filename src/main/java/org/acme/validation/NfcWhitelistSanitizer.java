@@ -16,14 +16,14 @@ public class NfcWhitelistSanitizer {
     }
 
     public static String sanitize(String field, String input) {
-        return sanitize(field, input, false, Normalizer.Form.NFKC);
+        return sanitize(field, input, false, Normalizer.Form.NFKC, false);
     }
 
     public static String sanitize(String field, String input, boolean preserveNewlines) {
-        return sanitize(field, input, preserveNewlines, Normalizer.Form.NFKC);
+        return sanitize(field, input, preserveNewlines, Normalizer.Form.NFKC, false);
     }
 
-    public static String sanitize(String field, String input, boolean preserveNewlines, Normalizer.Form form) {
+    public static String sanitize(String field, String input, boolean preserveNewlines, Normalizer.Form form, boolean allowEmoji) {
         if (input == null) return null;
 
         var s = input;
@@ -50,7 +50,7 @@ public class NfcWhitelistSanitizer {
                 return;
             }
 
-            if (isAllowed(cp)) {
+            if (isAllowed(cp, allowEmoji)) {
                 sb.appendCodePoint(cp);
             }
         });
@@ -67,15 +67,19 @@ public class NfcWhitelistSanitizer {
     }
 
     @SuppressWarnings("UnicodeEscape")
-    private static boolean isAllowed(int cp) {
+    private static boolean isAllowed(int cp, boolean allowEmoji) {
         // Explicit allowances not covered by categories
         if (cp == ' ' || cp == '\n') return true;
 
         return switch (getType(cp)) {
             case UPPERCASE_LETTER, LOWERCASE_LETTER, TITLECASE_LETTER,
-                 MODIFIER_LETTER, OTHER_LETTER, DECIMAL_DIGIT_NUMBER, CONNECTOR_PUNCTUATION, DASH_PUNCTUATION,
+                 MODIFIER_LETTER, OTHER_LETTER,
+                 NON_SPACING_MARK, COMBINING_SPACING_MARK, ENCLOSING_MARK,
+                 DECIMAL_DIGIT_NUMBER, CONNECTOR_PUNCTUATION, DASH_PUNCTUATION,
                  START_PUNCTUATION, END_PUNCTUATION, INITIAL_QUOTE_PUNCTUATION, FINAL_QUOTE_PUNCTUATION,
-                 OTHER_PUNCTUATION, MATH_SYMBOL, SPACE_SEPARATOR, CURRENCY_SYMBOL, MODIFIER_SYMBOL -> true;
+                 OTHER_PUNCTUATION, MATH_SYMBOL, CURRENCY_SYMBOL, MODIFIER_SYMBOL -> true;
+
+            case OTHER_SYMBOL -> allowEmoji;
 
             default -> false;
         };

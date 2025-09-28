@@ -119,7 +119,7 @@ class TextNormalizerTest {
         }
 
         @Test
-        void nbspNotCollapsedInDefaultMode() {
+        void nbspCollapsedInDefaultMode() {
             var nbsp = '\u00A0';
             var input = "a" + nbsp + nbsp + "b";
             var expected = "a b";
